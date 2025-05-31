@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
@@ -533,7 +533,7 @@
                     status.textContent = '     ';
                     acUnit.classList.remove('power-off');
                 } else {
-                    status.textContent = '已关机';
+                    status.textContent = '    ';
                     acUnit.classList.add('power-off');
                 }
             });
@@ -562,7 +562,7 @@
                         'focused': '专注工作 - 静音模式',
                         'sleepy': '困倦模式 - 夜间静音'
                     };
-                    status.textContent = isPoweredOn ? `运行中 - ${moods[mood]}` : '已关机';
+                    status.textContent = isPoweredOn ? `运行中 - ${moods[mood]}` : '     ';
                 });
             });
             
