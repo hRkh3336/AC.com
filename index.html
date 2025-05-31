@@ -1,0 +1,598 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能桌面小空调</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a2a6c 0%, #3a6186 100%);
+            padding: 20px;
+            overflow: hidden;
+        }
+        
+        .container {
+            max-width: 100%;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        
+        .decoration {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            top: -150px;
+            right: -150px;
+            z-index: -1;
+        }
+        
+        .decoration:nth-child(2) {
+            width: 200px;
+            height: 200px;
+            bottom: -100px;
+            left: -100px;
+            top: auto;
+            right: auto;
+        }
+        
+        .air-conditioner {
+            width: 380px;
+            height: 520px;
+            background: linear-gradient(to bottom, #2c3e50, #1a1a2e);
+            border-radius: 25px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+            border: 10px solid #1a1a1a;
+            transition: transform 0.3s ease;
+        }
+        
+        .air-conditioner:hover {
+            transform: translateY(-5px);
+        }
+        
+        .top-panel {
+            height: 70px;
+            background: #0d0d0d;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 25px;
+            border-bottom: 2px solid #333;
+        }
+        
+        .brand {
+            color: #f0f0f0;
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .brand span {
+            color: #4da6ff;
+            margin-left: 5px;
+        }
+        
+        .brand i {
+            margin-right: 10px;
+            color: #4da6ff;
+        }
+        
+        .power-btn {
+            width: 50px;
+            height: 30px;
+            background: #333;
+            border-radius: 15px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .power-btn.active {
+            background: #00cc66;
+        }
+        
+        .power-btn::before {
+            content: '';
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            background: #f0f0f0;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s ease;
+        }
+        
+        .power-btn.active::before {
+            left: 22px;
+        }
+        
+        .display {
+            height: 150px;
+            background: linear-gradient(to bottom, #0d1b2a, #1b263b);
+            margin: 20px 25px;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #e0e0e0;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.5);
+            border: 2px solid #2a3a4a;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .display::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(64, 224, 208, 0.1) 0%, transparent 70%);
+            opacity: 0.3;
+        }
+        
+        .temperature {
+            font-size: 72px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            text-shadow: 0 0 10px rgba(100, 200, 255, 0.7);
+        }
+        
+        .temperature span {
+            font-size: 40px;
+            vertical-align: super;
+        }
+        
+        .humidity {
+            font-size: 18px;
+            color: #a0a0a0;
+            display: flex;
+            align-items: center;
+        }
+        
+        .humidity i {
+            margin-right: 8px;
+            color: #4da6ff;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 25px;
+            height: 60px;
+        }
+        
+        .temp-control {
+            display: flex;
+            align-items: center;
+            background: #1a1a2e;
+            border-radius: 30px;
+            padding: 5px;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
+            width: 100%;
+        }
+        
+        .temp-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(to bottom, #3498db, #2980b9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 28px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .temp-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .temp-display {
+            width: 100%;
+            text-align: center;
+            font-size: 20px;
+            color: #f0f0f0;
+            padding: 0 15px;
+        }
+        
+        .mode-control {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 10px 25px 20px;
+        }
+        
+        .mode-title {
+            color: #a0a0a0;
+            margin-bottom: 10px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .mode-title i {
+            margin-right: 8px;
+            color: #3498db;
+        }
+        
+        .mode-buttons {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .mode-btn {
+            width: 70px;
+            height: 40px;
+            background: #1a1a2e;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #a0a0a0;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid #2a3a4a;
+        }
+        
+        .mode-btn.active {
+            background: linear-gradient(to bottom, #3498db, #2980b9);
+            color: white;
+            border-color: #3498db;
+            box-shadow: 0 0 15px rgba(52, 152, 219, 0.5);
+        }
+        
+        .mood-section {
+            margin: 25px 25px 15px;
+        }
+        
+        .mood-title {
+            color: #f0f0f0;
+            font-size: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .mood-title i {
+            margin-right: 10px;
+            color: #ffcc00;
+        }
+        
+        .mood-selector {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .mood-option {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 28px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #1a1a2e;
+            border: 2px solid transparent;
+        }
+        
+        .mood-option:hover {
+            transform: translateY(-5px);
+            border-color: #3498db;
+        }
+        
+        .mood-option.active {
+            transform: scale(1.1);
+            border: 3px solid #3498db;
+            box-shadow: 0 0 20px rgba(52, 152, 219, 0.7);
+        }
+        
+        .wind-control {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 10px 25px 0;
+        }
+        
+        .wind-title {
+            color: #a0a0a0;
+            margin-bottom: 10px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .wind-title i {
+            margin-right: 8px;
+            color: #3498db;
+        }
+        
+        .wind-buttons {
+            display: flex;
+            gap: 15px;
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .wind-btn {
+            width: 80px;
+            height: 40px;
+            background: #1a1a2e;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #a0a0a0;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid #2a3a4a;
+        }
+        
+        .wind-btn.active {
+            background: linear-gradient(to bottom, #3498db, #2980b9);
+            color: white;
+            border-color: #3498db;
+            box-shadow: 0 0 15px rgba(52, 152, 219, 0.5);
+        }
+        
+        .status {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            color: #4da6ff;
+            font-size: 16px;
+            opacity: 0.8;
+            padding: 0 25px;
+        }
+        
+        /* Mood-specific styles */
+        .mood-happy .display {
+            background: linear-gradient(to bottom, #0d2b45, #1b3b5b);
+        }
+        
+        .mood-happy .display::before {
+            background: radial-gradient(circle at center, rgba(100, 255, 218, 0.2) 0%, transparent 70%);
+        }
+        
+        .mood-calm .display {
+            background: linear-gradient(to bottom, #0d2b2b, #1b3b3b);
+        }
+        
+        .mood-calm .display::before {
+            background: radial-gradient(circle at center, rgba(100, 255, 150, 0.2) 0%, transparent 70%);
+        }
+        
+        .mood-energetic .display {
+            background: linear-gradient(to bottom, #452b0d, #5b3b1b);
+        }
+        
+        .mood-energetic .display::before {
+            background: radial-gradient(circle at center, rgba(255, 200, 100, 0.2) 0%, transparent 70%);
+        }
+        
+        .mood-focused .display {
+            background: linear-gradient(to bottom, #2b0d45, #3b1b5b);
+        }
+        
+        .mood-focused .display::before {
+            background: radial-gradient(circle at center, rgba(200, 100, 255, 0.2) 0%, transparent 70%);
+        }
+        
+        .mood-sleepy .display {
+            background: linear-gradient(to bottom, #1a1a2e, #0d0d1a);
+        }
+        
+        .mood-sleepy .display::before {
+            background: radial-gradient(circle at center, rgba(100, 150, 255, 0.1) 0%, transparent 70%);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="decoration"></div>
+        <div class="decoration"></div>
+        
+        <div class="air-conditioner mood-happy">
+            <div class="top-panel">
+                <div class="brand"><i class="fas fa-wind"></i>COOL<span>MASTER</span></div>
+                <div class="power-btn active"></div>
+            </div>
+            
+            <div class="display">
+                <div class="temperature">24<span>°C</span></div>
+                <div class="humidity"><i class="fas fa-tint"></i>湿度 45%</div>
+            </div>
+            
+            <div class="controls">
+                <div class="temp-control">
+                    <button class="temp-btn" id="temp-down">−</button>
+                    <div class="temp-display">温度控制</div>
+                    <button class="temp-btn" id="temp-up">+</button>
+                </div>
+            </div>
+            
+            <div class="mode-control">
+                <div class="mode-title"><i class="fas fa-cog"></i>运行模式</div>
+                <div class="mode-buttons">
+                    <div class="mode-btn active">制冷</div>
+                    <div class="mode-btn">除湿</div>
+                    <div class="mode-btn">送风</div>
+                </div>
+            </div>
+            
+            <div class="wind-control">
+                <div class="wind-title"><i class="fas fa-fan"></i>风速设置</div>
+                <div class="wind-buttons">
+                    <div class="wind-btn active">弱风</div>
+                    <div class="wind-btn">中风</div>
+                    <div class="wind-btn">强风</div>
+                </div>
+            </div>
+            
+            <div class="mood-section">
+                <div class="mood-title"><i class="fas fa-smile"></i>当前心情</div>
+                <div class="mood-selector">
+                    <div class="mood-option active" data-mood="happy">😊</div>
+                    <div class="mood-option" data-mood="calm">😌</div>
+                    <div class="mood-option" data-mood="energetic">😃</div>
+                    <div class="mood-option" data-mood="focused">🧐</div>
+                    <div class="mood-option" data-mood="sleepy">😴</div>
+                </div>
+            </div>
+            
+            <div class="status">     </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tempDisplay = document.querySelector('.temperature');
+            const tempDownBtn = document.getElementById('temp-down');
+            const tempUpBtn = document.getElementById('temp-up');
+            const powerBtn = document.querySelector('.power-btn');
+            const acUnit = document.querySelector('.air-conditioner');
+            const moodOptions = document.querySelectorAll('.mood-option');
+            const modeButtons = document.querySelectorAll('.mode-btn');
+            const windButtons = document.querySelectorAll('.wind-btn');
+            
+            let currentTemp = 24;
+            let isPoweredOn = true;
+            
+            // 温度控制
+            tempDownBtn.addEventListener('click', function() {
+                if (!isPoweredOn) return;
+                if (currentTemp > 16) {
+                    currentTemp--;
+                    updateTemperature();
+                }
+            });
+            
+            tempUpBtn.addEventListener('click', function() {
+                if (!isPoweredOn) return;
+                if (currentTemp < 30) {
+                    currentTemp++;
+                    updateTemperature();
+                }
+            });
+            
+            function updateTemperature() {
+                tempDisplay.textContent = currentTemp + '°C';
+                tempDisplay.innerHTML = currentTemp + '<span>°C</span>';
+                
+                // 更新状态信息
+                const status = document.querySelector('.status');
+                if (currentTemp <= 18) {
+                    status.textContent = '      ';
+                } else if (currentTemp >= 28) {
+                    status.textContent = '    ';
+                } else {
+                    status.textContent = '     ';
+                }
+            }
+            
+            // 电源开关
+            powerBtn.addEventListener('click', function() {
+                isPoweredOn = !isPoweredOn;
+                powerBtn.classList.toggle('active', isPoweredOn);
+                
+                const status = document.querySelector('.status');
+                if (isPoweredOn) {
+                    status.textContent = '     ';
+                    acUnit.classList.remove('power-off');
+                } else {
+                    status.textContent = '已关机';
+                    acUnit.classList.add('power-off');
+                }
+            });
+            
+            // 心情选择
+            moodOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    // 移除所有active类
+                    moodOptions.forEach(opt => opt.classList.remove('active'));
+                    // 添加active类到当前选项
+                    this.classList.add('active');
+                    
+                    // 移除所有心情类
+                    acUnit.classList.remove('mood-happy', 'mood-calm', 'mood-energetic', 'mood-focused', 'mood-sleepy');
+                    
+                    // 添加当前心情类
+                    const mood = this.getAttribute('data-mood');
+                    acUnit.classList.add(`mood-${mood}`);
+                    
+                    // 更新状态信息
+                    const status = document.querySelector('.status');
+                    const moods = {
+                        'happy': '心情愉快 - 舒适模式',
+                        'calm': '心情平静 - 柔和模式',
+                        'energetic': '精力充沛 - 强力模式',
+                        'focused': '专注工作 - 静音模式',
+                        'sleepy': '困倦模式 - 夜间静音'
+                    };
+                    status.textContent = isPoweredOn ? `运行中 - ${moods[mood]}` : '已关机';
+                });
+            });
+            
+            // 模式选择
+            modeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    modeButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+            
+            // 风速控制
+            windButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    windButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+            
+            // 添加动画效果
+            setInterval(() => {
+                if (!isPoweredOn) return;
+                
+                const display = document.querySelector('.display');
+                display.style.boxShadow = 'inset 0 0 20px rgba(100, 200, 255, 0.4)';
+                setTimeout(() => {
+                    display.style.boxShadow = 'inset 0 0 15px rgba(0, 0, 0, 0.5)';
+                }, 500);
+            }, 3000);
+        });
+    </script>
+</body>
+</html>
